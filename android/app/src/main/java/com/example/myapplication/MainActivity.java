@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 UDPSocket.send(packetSend);
 
                 // Récupération des dernières valeurs
-                byte[] dataReceive = new byte[1024];
+                byte[] dataReceive = new byte[254];
                 DatagramPacket packetReceive = new DatagramPacket(dataReceive, dataReceive.length, address, portServer);
                 UDPSocket.receive(packetReceive);
                 String contentReceive = new String(Arrays.copyOfRange(packetReceive.getData(), 0, packetReceive.getLength()));
