@@ -1,14 +1,43 @@
-from ssd1306_px import set_px
-from ssd1306 import draw_screen, initialize, clear_oled
-
+from ssd1306 import initialize, clear_oled
+from ssd1306_text import add_text
 from microbit import *
 import radio
+from time import sleep
+import sys
 
-radio.config(group=1)
+print (sys.version)
+
+print("start main")
+conf = "LT"
+
+radio_group=1
+print("radio_group: " + str(radio_group))
+radio.config(group=radio_group)
 radio.on()
-    
-# Recepteur
+
+initialize(pinReset=pin0)
+
 while True:
-    message = radio.receive()
-    if button_a.was_pressed():
-        display.scroll(message)
+    print("start while")
+    msg = radio.receive()
+    if msg is not None:
+        print("msg: "+ str(msg))
+        conf = msg
+    
+    message_to_send = str(temperature())+" "+str(display.read_light_level())
+    radio.send(message_to_send)
+    
+    string_temp = "temp: " + str(temperature())
+    string_light = "light: " + str(display.read_light_level())
+    if conf == "LT":
+         add_text(0, 1, string_light)
+         add_text(0, 0, string_temp)
+    elif conf == "TL":
+         add_text(0, 0, string_light)
+         add_text(0, 1, string_temp)
+    print("End while")
+    
+        
+    
+    
+
