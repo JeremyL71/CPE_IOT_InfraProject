@@ -1,10 +1,15 @@
 from microbit import *
 import radio
 
-radio.config(group=1)
-radion.on()
+radio.config(group=51)
+radio.on()
 
-# Emetteur
+uart.init(baudrate=115200)
+
 while True:
-    radio.send(str(temperature()))
-    sleep(10)
+    msg = radio.receive()
+    if msg != None:
+        print(msg)
+    if uart.any():
+        msg_bytes=uart.read()
+        radio.send(msg_bytes)
