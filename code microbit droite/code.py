@@ -50,7 +50,7 @@ while True:
     
     # Envoi du message:
     # ---------------------------------------#
-    message = Packet("nathan aime les penis", int(temperature()), int(display.read_light_level()))
+    message = Packet("Android", int(temperature()), int(display.read_light_level()))
     radio.send(message.send())
     sleep(1)
     # ---------------------------------------#
