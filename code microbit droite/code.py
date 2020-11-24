@@ -1,16 +1,14 @@
-def on_button_pressed_a():
-    radio.send_number(0)
-    basic.show_icon(IconNames.HAPPY)
-input.on_button_pressed(Button.A, on_button_pressed_a)
+from ssd1306_px import set_px
+from ssd1306 import draw_screen, initialize, clear_oled
 
-def on_button_pressed_b():
-    radio.send_number(1)
-    basic.show_icon(IconNames.SAD)
-input.on_button_pressed(Button.B, on_button_pressed_b)
+from microbit import *
+import radio
 
-def on_received_number(receivedNumber):
-    if receivedNumber == 0:
-        basic.show_icon(IconNames.HAPPY)
-    if receivedNumber == 1:
-        basic.show_icon(IconNames.SAD)
-radio.on_received_number(on_received_number)
+radio.config(group=1)
+radio.on()
+    
+# Recepteur
+while True:
+    message = radio.receive()
+    if button_a.was_pressed():
+        display.scroll(message)
