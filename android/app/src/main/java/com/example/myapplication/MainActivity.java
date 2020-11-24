@@ -3,94 +3,125 @@ package com.example.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import com.example.myapplication.model.AppData;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button getDataBtn;
+    private Button toggleFormatbtn;
+    private Button askValuesBtn;
     private ConstraintLayout resultPanel;
-    private TextView tempValue;
-    private TextView lumValue;
+    private TextView temperatureValue;
+    private TextView luminositeValue;
 
     private String ipAddress;
-    private int port;
+    private int portServer;
+
+    private String[] formatValues;
+    private int currentValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ipAddress = "192.168.43.18";
-        port = 10000;
+        ipAddress = "172.20.10.2";
+        portServer = 56000;
 
-        getDataBtn = (Button) findViewById(R.id.getData);
+        formatValues = new String[]{"LT", "TL"};
+        currentValue = 0;
+
+        toggleFormatbtn = (Button) findViewById(R.id.toggle_format);
+        askValuesBtn = (Button) findViewById(R.id.ask_values);
         resultPanel = (ConstraintLayout) findViewById(R.id.resultPanel);
-        tempValue = (TextView) findViewById(R.id.tempValue);
-        lumValue = (TextView) findViewById(R.id.lumValue);
+        temperatureValue = (TextView) findViewById(R.id.temperature_value);
+        luminositeValue = (TextView) findViewById(R.id.luminosite_value);
 
         resultPanel.setVisibility(View.INVISIBLE);
-        (new ReceiverTask()).execute();
 
-        getDataBtn.setOnClickListener(new View.OnClickListener() {
+        askValuesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-                (new Thread() {
-                    public void run() {
-                        try {
-                            String test = "LT";
-                            byte[] data = test.getBytes();
-                            DatagramSocket UDPSocket = new DatagramSocket();
-                            InetAddress address = InetAddress.getByName(ipAddress);
-                            DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-                            UDPSocket.send(packet);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
+                (new GetDataTask()).execute();
             }
         });
+
+        toggleFormatbtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                currentValue = (currentValue + 1) % formatValues.length;
+                sendFormatValue();
+            }
+        });
+
+        sendFormatValue();
+        (new GetDataTask()).execute();
     }
 
-    class ReceiverTask extends AsyncTask<String, Void, Void>{
-        @Override
-        protected Void doInBackground(String... arg0) {
-            try {
-                DatagramSocket UDPSocket = new DatagramSocket(port);
-                while(true){
-                    byte[] data = new byte [1024]; // Espace de réception des données.
-                    DatagramPacket packet = new DatagramPacket(data, data.length);
-                    UDPSocket.receive(packet);
-                    String str = new String(packet.getData());
-                    System.out.println("str : " + str);
-                    resultPanel.setVisibility(View.VISIBLE);
+    public void sendFormatValue() {
+        (new Thread() {
+            public void run() {
+                try {
+                    String content = formatValues[currentValue];
+                    byte[] data = content.getBytes();
+                    DatagramSocket UDPSocket = new DatagramSocket();
+                    InetAddress address = InetAddress.getByName(ipAddress);
+                    DatagramPacket packet = new DatagramPacket(data, data.length, address, portServer);
+                    UDPSocket.send(packet);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (SocketException e) {
-                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    class GetDataTask extends AsyncTask<Void, AppData, Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                // Envoie de la demande de valeurs
+                String content = "getValues()";
+                byte[] dataSend = content.getBytes();
+                DatagramSocket UDPSocket = new DatagramSocket();
+                InetAddress address = InetAddress.getByName(ipAddress);
+                DatagramPacket packetSend = new DatagramPacket(dataSend, dataSend.length, address, portServer);
+                UDPSocket.send(packetSend);
+
+                // Récupération des dernières valeurs
+                byte[] dataReceive = new byte[1024];
+                DatagramPacket packetReceive = new DatagramPacket(dataReceive, dataReceive.length, address, portServer);
+                UDPSocket.receive(packetReceive);
+                String contentReceive = new String(Arrays.copyOfRange(packetReceive.getData(), 0, packetReceive.getLength()));
+                System.out.println("[+] " + contentReceive);
+                int temperature = Integer.parseInt(contentReceive.split(" ")[0]);
+                int luminosite = Integer.parseInt(contentReceive.split(" ")[1]);
+                publishProgress(new AppData(temperature, luminosite));
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;
         }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+
+        protected void onProgressUpdate(AppData... appDatas) {
+            updatedatas(appDatas[0]);
         }
-        @Override
-        protected void onPostExecute(Void result) {
-            super.onPostExecute(result);
-        }
+
+    }
+
+    public void updatedatas(AppData appData) {
+        resultPanel.setVisibility(View.VISIBLE);
+        temperatureValue.setText(String.valueOf(appData.getTemperature()));
+        luminositeValue.setText(String.valueOf(appData.getLuminosite()));
     }
 }
