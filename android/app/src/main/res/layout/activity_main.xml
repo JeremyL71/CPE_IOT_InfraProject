@@ -14,11 +14,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/getData"
+        app:layout_constraintTop_toBottomOf="@+id/toggle_format"
         app:layout_constraintVertical_bias="0.093">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/temperature_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Température"
@@ -31,7 +31,7 @@
             app:layout_constraintVertical_bias="0.342" />
 
         <TextView
-            android:id="@+id/textView8"
+            android:id="@+id/luminosite_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Lumière"
@@ -44,7 +44,7 @@
             app:layout_constraintVertical_bias="0.57" />
 
         <TextView
-            android:id="@+id/lumValue"
+            android:id="@+id/luminosite_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="lumValue"
@@ -57,7 +57,7 @@
             app:layout_constraintVertical_bias="0.57" />
 
         <TextView
-            android:id="@+id/tempValue"
+            android:id="@+id/temperature_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="tempValue"
@@ -85,10 +85,10 @@
         app:layout_constraintVertical_bias="0.109" />
 
     <Button
-        android:id="@+id/getData"
+        android:id="@+id/toggle_format"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get data"
+        android:text="Toggle Format"
         app:backgroundTint="#5FB54B"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -96,5 +96,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.449" />
+
+    <Button
+        android:id="@+id/ask_values"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get Values"
+        app:backgroundTint="#5FB54B"
+        app:layout_constraintBottom_toTopOf="@+id/toggle_format"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
