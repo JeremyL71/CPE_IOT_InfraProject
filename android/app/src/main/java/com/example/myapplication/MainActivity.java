@@ -3,6 +3,7 @@ package com.example.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -32,8 +33,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ipAddress = "82.67.78.62";
-        port = 4444;
+        ipAddress = "192.168.43.18";
+        port = 10000;
 
         getDataBtn = (Button) findViewById(R.id.getData);
         resultPanel = (ConstraintLayout) findViewById(R.id.resultPanel);
@@ -41,52 +42,55 @@ public class MainActivity extends AppCompatActivity {
         lumValue = (TextView) findViewById(R.id.lumValue);
 
         resultPanel.setVisibility(View.INVISIBLE);
+        (new ReceiverTask()).execute();
 
         getDataBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                getData();
+                (new Thread() {
+                    public void run() {
+                        try {
+                            String test = "LT";
+                            byte[] data = test.getBytes();
+                            DatagramSocket UDPSocket = new DatagramSocket();
+                            InetAddress address = InetAddress.getByName(ipAddress);
+                            DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
+                            UDPSocket.send(packet);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
             }
         });
     }
 
-    public void getData() {
-        (new Thread() {
-            public void run() {
-                try {
-                    String test = "hello";
-                    byte[] data = test.getBytes();
-                    DatagramSocket UDPSocket = new DatagramSocket();
-                    InetAddress address = InetAddress.getByName(ipAddress);
-                    DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
-                    UDPSocket.send(packet);
-                } catch (IOException e) {
-                    e.printStackTrace();
+    class ReceiverTask extends AsyncTask<String, Void, Void>{
+        @Override
+        protected Void doInBackground(String... arg0) {
+            try {
+                DatagramSocket UDPSocket = new DatagramSocket(port);
+                while(true){
+                    byte[] data = new byte [1024]; // Espace de réception des données.
+                    DatagramPacket packet = new DatagramPacket(data, data.length);
+                    UDPSocket.receive(packet);
+                    String str = new String(packet.getData());
+                    System.out.println("str : " + str);
+                    resultPanel.setVisibility(View.VISIBLE);
                 }
+            } catch (SocketException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        }).start();
-
-        (new Thread() {
-            public void run() {
-                try {
-                    DatagramSocket server = new DatagramSocket(port);
-
-                    while(true) {
-                        byte[] buffer = new byte[8192];
-                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-
-                        server.receive(packet);
-
-                        String str = new String(packet.getData());
-                        packet.setLength(buffer.length);
-                        System.out.println(str);
-                        resultPanel.setVisibility(View.VISIBLE);
-                    }
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+            return null;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+        }
     }
 }
