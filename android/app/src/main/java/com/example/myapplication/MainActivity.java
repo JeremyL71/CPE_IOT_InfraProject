@@ -11,6 +11,9 @@ import android.widget.TextView;
 
 import com.example.myapplication.model.AppData;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -36,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ipAddress = "172.20.10.2";
+        ipAddress = "192.168.1.43";
         portServer = 56000;
 
         formatValues = new String[]{"LT", "TL"};
@@ -104,10 +107,10 @@ public class MainActivity extends AppCompatActivity {
                 UDPSocket.receive(packetReceive);
                 String contentReceive = new String(Arrays.copyOfRange(packetReceive.getData(), 0, packetReceive.getLength()));
                 System.out.println("[+] " + contentReceive);
-                int temperature = Integer.parseInt(contentReceive.split(" ")[0]);
-                int luminosite = Integer.parseInt(contentReceive.split(" ")[1]);
-                publishProgress(new AppData(temperature, luminosite));
-            } catch (IOException e) {
+
+                JSONObject dataJson = new JSONObject(contentReceive);
+                publishProgress(new AppData(dataJson.getJSONObject("packet").getInt("temperature"), dataJson.getJSONObject("packet").getInt("luminosite")));
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
             return null;

@@ -9,8 +9,10 @@ import SocketServer
 import serial
 import threading
 import json
+import sqlite3
+import os
 
-HOST           = "172.20.10.2"
+HOST           = "192.168.1.43"
 UDP_PORT       = 56000
 MICRO_COMMANDS = ["TL" , "LT"]
 FILENAME        = "values.txt"
@@ -22,23 +24,23 @@ class ThreadedUDPRequestHandler(SocketServer.BaseRequestHandler):
         data = self.request[0].strip()
         socket = self.request[1]
         current_thread = threading.current_thread()
-        print("{}: client: {}, wrote: {}".format(current_thread.name, self.client_address, data))
+        print("[+] {}: client: {}, wrote: {}".format(current_thread.name, self.client_address, data))
         if data != "":
                         if data in MICRO_COMMANDS: # Send message through UART
                                 sendUARTMessage(data)
                                 
                         elif data == "getValues()": # Sent last value received from micro-controller
-                                socket.sendto(LAST_VALUE, self.client_address) 
-                                # TODO: Create last_values_received as global variable      
+                                socket.sendto(getLastValues(), self.client_address) 
+                                      
                         else:
-                                print("Unknown message: ",data)
+                                print("[-] Unknown message: ",data)
 
 class ThreadedUDPServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
     pass
 
 
 # send serial message 
-SERIALPORT = "/dev/tty.usbmodem144302"
+SERIALPORT = "/dev/tty.Bluetooth-Incoming-Port"
 BAUDRATE = 115200
 ser = serial.Serial()
 
@@ -57,26 +59,74 @@ def initUART():
         ser.rtscts = False     #disable hardware (RTS/CTS) flow control
         ser.dsrdtr = False       #disable hardware (DSR/DTR) flow control
         #ser.writeTimeout = 0     #timeout for write
-        print('Starting Up Serial Monitor')
+        print('[+] Starting Up Serial Monitor')
         try:
                 ser.open()
         except serial.SerialException:
-                print("Serial {} port not available".format(SERIALPORT))
+                print("[-] Serial {} port not available".format(SERIALPORT))
                 exit()
 
 
 
 def sendUARTMessage(msg):
-    ser.write(msg)
-    print("Message <" + msg + "> sent to micro-controller." )
+        dataJson = json.dumps({
+                'destinataire': 'Microbit',
+                'packet': {
+                        'format': msg
+                }
+        })
+        ser.write(dataJson)
+        print("[+] Message <" + dataJson + "> sent to micro-controller." )
+
+def initDatabaseConnexion():
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        db_path = os.path.join(BASE_DIR, "database.sqlite")
+        return sqlite3.connect(db_path)
+
+def insertData(data):
+        con = initDatabaseConnexion()
+        # Creation du curseur
+        cur = con.cursor()
+        # Execution de la commande SQL
+        cur.execute("INSERT INTO data(temperature, luminosite) VALUES (?1, ?2);", (data['packet']['temperature'], data['packet']['luminosite']))
+        # Fermeture du curseur
+        cur.close()
+        con.close()
+
+def getLastValues(): 
+        con = initDatabaseConnexion()
+        # Creation du curseur
+        cur = con.cursor()
+        # Execution de la commande SQL
+        cur.execute("SELECT temperature, luminosite FROM data ORDER BY data_id DESC LIMIT 1;")
+
+        row = cur.fetchone()
+
+        jsonString = ""
+
+        if row != None:
+                jsonString = json.dumps({
+                        'destinataire': 'Android',
+                        'packet': {
+                                'temperature': row[0],
+                                'luminosite': row[1]
+                        }
+                })
+
+        # Fermeture du curseur
+        cur.close()
+        con.close()
+
+        return jsonString
+
 
 
 # Main program logic follows:
 if __name__ == '__main__':
+        print('[+] Initialisation de la connexion UART')
         initUART()
-        f= open(FILENAME,"a")
-        print ('Press Ctrl-C to quit.')
 
+        print ('[+] Press Ctrl-C to quit.')
         server = ThreadedUDPServer((HOST, UDP_PORT), ThreadedUDPRequestHandler)
 
         server_thread = threading.Thread(target=server.serve_forever)
@@ -84,7 +134,7 @@ if __name__ == '__main__':
 
         try:
                 server_thread.start()
-                print("Server started at {} port {}".format(HOST, UDP_PORT))
+                print("[+] Server started at {} port {}".format(HOST, UDP_PORT))
                 while ser.isOpen() : 
                         time.sleep(1)
                         if (ser.inWaiting() > 0):
@@ -92,8 +142,8 @@ if __name__ == '__main__':
                                 try:
                                         data = json.loads(data_str)
                                         print('[+] Temperature : ' + str(data['packet']['temperature']))
-                                        print('[+] Luminosite : ' + str(data['packet']['luminosite']))                                                                
-                                        LAST_VALUE = str(data['packet']['temperature']) + " " + str(data['packet']['luminosite'])
+                                        print('[+] Luminosite : ' + str(data['packet']['luminosite']))   
+                                        insertData(data)
                                 except (ValueError):
                                         print('[-] Erreur lors du parsing json')
         except (KeyboardInterrupt, SystemExit):
