@@ -4,7 +4,7 @@ from ssd1306 import command
 
 
 def blink(time=1000):
-    for c in ([0xae], [0xaf]):
+    for c in ([0xAE], [0xAF]):
         command(c)
         sleep(time / 2)
 
@@ -16,4 +16,4 @@ def pulse(time=500):
         for i in range(x, y, z):
             command([0x81, i])
             sleep(per_step)
-    command([0x81, 0xcf])
+    command([0x81, 0xCF])

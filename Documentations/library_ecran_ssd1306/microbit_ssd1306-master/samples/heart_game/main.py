@@ -36,9 +36,9 @@ while True:
         add_text(2, 3, "Score: " + str(score))
         sleep(1000)
         clear_oled()
-    if not ((ax + 5 < x or x + 5 < ax) or (ay + 7 < y + 1 or y + 7 < ay+1)):
+    if not ((ax + 5 < x or x + 5 < ax) or (ay + 7 < y + 1 or y + 7 < ay + 1)):
         add_text(2, 1, "GAME OVER")
         add_text(2, 3, "Score: " + str(score))
         sleep(4000)
         clear_oled()
-        (score, ay, x)=(0, 0, 0)
+        (score, ay, x) = (0, 0, 0)

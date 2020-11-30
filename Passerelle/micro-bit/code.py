@@ -11,5 +11,5 @@ while True:
     if msg != None:
         print(msg)
     if uart.any():
-        msg_bytes=uart.read()
+        msg_bytes = uart.read()
         radio.send(msg_bytes)

@@ -3,6 +3,7 @@ from ssd1306_px import get_px, set_px
 from microbit import accelerometer, button_b, button_a, sleep, display
 from random import randint
 from ssd1306_text import add_text
+
 initialize()
 clear_oled()
 pixels = []
@@ -43,14 +44,14 @@ while True:
     xv, yv = 1, 0  # start going right
     foodX, foodY = 0, 0
     # snake is a list of tuples which are coordinates
-    snake = [(xpos, ypos), (xpos+1, ypos)]
+    snake = [(xpos, ypos), (xpos + 1, ypos)]
     oldBrightness = 0  # start on dark pixel
     foodEaten, foodTimeout = True, 0
     # pick a speed, A reduces speed, B sets speed
     speed = pick_speed(speed)
     clear_oled()
     while not end:  # run until the game is over
-            # loop until randomly found blank square
+        # loop until randomly found blank square
         while foodEaten or foodTimeout == 0:
             if foodTimeout == 0 and not foodEaten:
                 set_px(foodX, foodY, 0)
@@ -84,11 +85,13 @@ while True:
         newpixel = get_px(newheadx, newheady)
         # if newpixel is 0, 1, or tail of snake
         tailJustMissed = (newheadx, newheady) == snake[
-            0]  # if tail of snake, delete tail
+            0
+        ]  # if tail of snake, delete tail
         if tailJustMissed:
             newpixel = 0
-        if (((newheadx, newheady) == (foodX, foodY)
-             ) and newpixel == 1) or newpixel == 0:
+        if (
+            ((newheadx, newheady) == (foodX, foodY)) and newpixel == 1
+        ) or newpixel == 0:
             # didn't hit ourself
             snake.append((newheadx, newheady))
             set_px(newheadx, newheady, 1)
@@ -100,7 +103,7 @@ while True:
             del snake[0]
         elif (newheadx, newheady) == (foodX, foodY):  # eaten the food
             foodEaten = True
-            score += (10 - speed)  # more points for faster game
+            score += 10 - speed  # more points for faster game
         # higher the speed, slower the game
         foodTimeout -= 1
         sleep(speed * 10)
