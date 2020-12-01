@@ -1,11 +1,10 @@
 from microbit import *
 import radio
 
-radio.config(group=51)
+radio.config(group=51, length=251)
 radio.on()
 
 uart.init(baudrate=115200)
-
 while True:
     msg = radio.receive()
     if msg != None:
