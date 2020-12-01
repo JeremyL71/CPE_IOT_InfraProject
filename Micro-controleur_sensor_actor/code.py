@@ -30,6 +30,16 @@ class Packet:
         return jsonString
 
 
+def receive(packet):
+    """
+    Recupère le destinataire du packet
+    """
+    return packet.split('{')[2].split(':')[1].split('\"')[1]
+
+
+
+
+
 clear_oled()
 
 print(sys.version)
@@ -51,8 +61,8 @@ while True:
     print("start while")
     msg = radio.receive()
     if msg is not None:
-        print("msg: " + str(msg))
-        conf = msg
+        conf = receive(msg)
+        print("conf received: " + str(conf))
         clear_oled()
 
     # Envoi du message:
