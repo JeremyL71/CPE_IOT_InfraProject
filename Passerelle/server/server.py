@@ -12,7 +12,7 @@ import json
 import sqlite3
 import os
 
-HOST = "192.168.1.43"
+HOST = "192.168.43.18"
 UDP_PORT = 56000
 MICRO_COMMANDS = ["TL", "LT"]
 FILENAME = "values.txt"
@@ -47,7 +47,7 @@ class ThreadedUDPServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
 
 
 # send serial message
-SERIALPORT = "/dev/tty.Bluetooth-Incoming-Port"
+SERIALPORT = "/dev/tty.usbmodem11202"
 BAUDRATE = 115200
 ser = serial.Serial()
 
@@ -97,6 +97,7 @@ def insertData(data):
         (data["packet"]["temperature"], data["packet"]["luminosite"]),
     )
     # Fermeture du curseur
+    con.commit()
     cur.close()
     con.close()
 
@@ -154,6 +155,8 @@ if __name__ == "__main__":
                     insertData(data)
                 except (ValueError):
                     print("[-] Erreur lors du parsing json")
+		except (KeyError):
+		    print("[-] Erreur lors de la recuperation du json")
     except (KeyboardInterrupt, SystemExit):
         server.shutdown()
         server.server_close()

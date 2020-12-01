@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ipAddress = "192.168.1.43";
+        ipAddress = "192.168.43.18";
         portServer = 56000;
 
         formatValues = new String[]{"LT", "TL"};
