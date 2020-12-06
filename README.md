@@ -2,7 +2,7 @@
 
 ## Présentation du projet:
 Le but étant de réaliser cette architecture:
-![Schéma de l'architecture](https://github.com/JeremyL71/CPE_IOT_InfraProject/blob/main/Documentations/photos/intro_sujet.PNG?raw=true)
+![enter image description here](https://github.com/JeremyL71/CPE_IOT_InfraProject/blob/main/Documentations/photos/intro_sujet.PNG?raw=true)
 
 ## Micro-bit sensor/actor
 ### Affichage de la température et de la luminosité
@@ -25,9 +25,7 @@ Utilisation d'un breakboard afin de relier l'écran OLED et le microbit.
  
  ### Instructions
  Le speudo code d'instruction est le suivant: 
- ![Speudo code instruction microbit sensor/actor](https://github.com/JeremyL71/CPE_IOT_InfraProject/blob/main/Documentations/photos/sc_instruc_microbit_oled.PNG?raw=true)
-
-
+ ![enter image description here](https://github.com/JeremyL71/CPE_IOT_InfraProject/blob/main/Documentations/photos/sc_instruc_microbit_oled.PNG?raw=true)
 ## Serveur
 
 ### Fonctionnalité 
