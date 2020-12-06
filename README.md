@@ -2,7 +2,8 @@
 
 ## Présentation du projet:
 Le but étant de réaliser cette architecture:
-![enter image description here](https://github.com/JeremyL71/CPE_IOT_InfraProject/blob/main/Documentations/photos/intro_sujet.PNG?raw=true)
+
+![enter image description here](https://github.com/JeremyL71/CPE_IOT_InfraProject/blob/main/Documentations/photos/architecture.PNG?raw=true)
 
 ## Micro-bit sensor/actor
 ### Affichage de la température et de la luminosité
@@ -24,8 +25,10 @@ Utilisation d'un breakboard afin de relier l'écran OLED et le microbit.
  - lien vers la bibliothèque python pour l'écran ssd1306: https://github.com/CPELyon/microbit_ssd1306
  
  ### Instructions
- Le speudo code d'instruction est le suivant: 
- ![enter image description here](https://github.com/JeremyL71/CPE_IOT_InfraProject/blob/main/Documentations/photos/sc_instruc_microbit_oled.PNG?raw=true)
+ Le speudo code d'instruction est le suivant:
+ 
+ -  ![enter image description here](https://github.com/JeremyL71/CPE_IOT_InfraProject/blob/main/Documentations/photos/sc_instruc_microbit_oled.PNG?raw=true)
+
 ## Serveur
 
 ### Fonctionnalité 
