@@ -1,6 +1,31 @@
 # CPE_IOT_InfraProject
 
-lien vers la datasheet: https://resources.kitronik.co.uk/pdf/5601b_built_edge_connector_breakout_board_for_the_bbc_microbit_datasheet_v1_1.pdf
+## Présentation du projet:
+Le but étant de réaliser cette architecture:
+![Schéma de l'architecture](https://github.com/JeremyL71/CPE_IOT_InfraProject/blob/main/Documentations/photos/intro_sujet.PNG?raw=true)
+
+## Micro-bit sensor/actor
+### Affichage de la température et de la luminosité
+Le but étant de d'afficher la température ambiante ainsi que la luminosité sur l'écran d'affichage suivante deux configurations:
+
+    température: 25°C
+    luminosité: 114
+
+ou bien
+
+    luminosité: 114
+    température: 25°C
+
+Cette configuration dépend de l'utilisateur et est commandé depuis l'application android.
+### Mise en place
+Utilisation d'un breakboard afin de relier l'écran OLED et le microbit.
+
+ -  lien vers la datasheet  du breakboard: https://resources.kitronik.co.uk/pdf/5601b_built_edge_connector_breakout_board_for_the_bbc_microbit_datasheet_v1_1.pd
+ - lien vers la bibliothèque python pour l'écran ssd1306: https://github.com/CPELyon/microbit_ssd1306
+ 
+ ### Instructions
+ Le speudo code d'instruction est le suivant: 
+ ![Speudo code instruction microbit sensor/actor](https://github.com/JeremyL71/CPE_IOT_InfraProject/blob/main/Documentations/photos/sc_instruc_microbit_oled.PNG?raw=true)
 
 
 ## Serveur
@@ -11,7 +36,7 @@ lien vers la datasheet: https://resources.kitronik.co.uk/pdf/5601b_built_edge_co
 - Stockage des données récupérer à travers la connexion serial
 - 2 endpoints : 
 - 1 pour donner accès aux informations stocké en base à l'application Android.
-- 1 pour transferer la demande de changement d'affichage du microbit.
+- 1 pour transférer la demande de changement d'affichage du microbit.
 
 
 ### Librairies
@@ -27,7 +52,7 @@ Il y a deux évènements qui déclenche une action sur le serveur :
 
 ### L'ajout de contenu dans le flux serial
 
-Cet évènement va déclancher différentes actions dans l'ordre :
+Cet évènement va déclencher différentes actions dans l'ordre :
 
 - Lecture du flux qui doit être au format JSON. 
 - Vérification que le contenu soit bien au format JSON sinon il n'est pas traité.
@@ -103,17 +128,17 @@ Différentes actions sont possibles depuis l'application Android :
 
 ### La récupération des valeurs du microbit
 
-Pour ces deux actions il est necessaire de passer par le serveur à travers une connexion UDP.
+Pour ces deux actions il est nécessaire de passer par le serveur à travers une connexion UDP.
 
-Au démarrage de l'application les informations sont automatiquements récupérer au près du serveur à travers ces différentes étapes : 
+Au démarrage de l'application les informations sont automatiquement récupérer au près du serveur à travers ces différentes étapes : 
 
 - Création de la connexion UDP
 - Envoi dans le packet UDP la commande suivante : `getValues()`
 - Récupération de la réponse du serveur.
-- On decode la reponse qui est au format JSON pour récupérer les valeurs.
+- On décode la réponse qui est au format JSON pour récupérer les valeurs.
 - Affichage du résultat.
 
-Pour pouvoir réaliser ces différentes actions il est necessaire d'utiliser le système AsyncTask qui permet d'effectuer un traitement asynchrone par rapport à l'application mais de ce synchroniser pour certaines actions. Ce traitement est parfait dans notre cas car il permet de faire le requête de façon asynchrone et de ne pas être bloquant pour l'application mais de ce synchroniser pour effectuer les changements de l'afficahge.
+Pour pouvoir réaliser ces différentes actions il est nécessaire d'utiliser le système AsyncTask qui permet d'effectuer un traitement asynchrone par rapport à l'application mais de ce synchroniser pour certaines actions. Ce traitement est parfait dans notre cas car il permet de faire le requête de façon asynchrone et de ne pas être bloquant pour l'application mais de ce synchroniser pour effectuer les changements de l'affichage.
 
 ### Changer le format de l'affichage du microbit
 
